@@ -41,12 +41,6 @@ const qualityObjectives = [
   },
 ];
 
-function calculateActual(target, risk) {
-  if (risk <= 0) return target;
-  if (risk >= 100) return 0;
-  return Math.max(0, target - (target / 100 * risk));
-}
-
 function createCard(quality) {
   const card = document.createElement('div');
   card.className = 'card';
@@ -131,11 +125,17 @@ function createCard(quality) {
     if (!title.querySelector('.title-input')) startRename();
   });
 
+  function calculateDeviation(target, risk) {
+    if (risk <= 0) return 0;
+    if (risk >= 100) return target;
+    return target / 100 * risk;
+  }
+
   card.updateValues = function () {
     const target = parseFloat(targetInput.value) || 0;
     const risk = parseFloat(riskInput.value) || 0;
-    const actual = calculateActual(target, risk);
-    const deviation = target > 0 ? target / 100 * risk : 0;
+    const deviation = calculateDeviation(target, risk);
+    const actual = target - deviation;
 
     targetValueEl.textContent = Math.round(target);
     riskValueEl.textContent = Math.round(risk);
